@@ -1,0 +1,15 @@
+def single_root_words(root_word, *other_words):
+    same_words = []
+    different_words = []
+
+    for word in other_words:
+        if root_word in word:
+            same_words.append(word)
+        else:
+            different_words.append(word)
+    return same_words, different_words
+
+same, different = single_root_words("студ", "студент", "студенческий", "стул", "преподаватель", "сессия", "студия")
+
+print("Однокоренные:", same)
+print("Другие:", different)
