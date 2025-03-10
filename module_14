@@ -1,0 +1,71 @@
+from time import sleep
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+option = webdriver.ChromeOptions()
+option.add_experimental_option('detach', True)
+driver = webdriver.Chrome(options=option)
+
+# Список доступных товаров
+products = {
+    1: "Sauce Labs Backpack",
+    2: "Sauce Labs Bike Light",
+    3: "Sauce Labs Bolt T-Shirt",
+    4: "Sauce Labs Fleece Jacket",
+    5: "Sauce Labs Onesie",
+    6: "Test.allTheThings() T-Shirt (Red)"
+}
+
+def main():
+    # Запрашиваем у пользователя, какие товары он хочет добавить в корзину
+    print("Доступные товары:")
+    for key, value in products.items():
+        print(f"{key}: {value}")
+
+    selected_products = input("Введите номера товаров через запятую: ")
+    selected_products = [int(x.strip()) for x in selected_products.split(",")]
+
+    # Заходим на сайт, вводим логин и пароль
+    driver.get("https://www.saucedemo.com/")
+    driver.find_element(By.ID, "user-name").send_keys("standard_user")
+    driver.find_element(By.ID, "password").send_keys("secret_sauce")
+    driver.find_element(By.ID, "login-button").click()
+
+    # Добавление выбранных товаров в корзину
+    for product_id in selected_products:
+        product_name = products[product_id]
+        driver.find_element(By.XPATH, f"//div[text()='{product_name}']/../../..//button").click()
+        sleep(1) # Небольшая пауза для загрузки
+
+    # Переход к корзине
+    driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
+
+    # Оформление заказа
+    driver.find_element(By.ID, "checkout").click()
+
+    # Заполнение данных для оформления заказа
+    first_name = input("Введите имя: ")
+    last_name = input("Введите фамилию: ")
+    postal_code = input("Введите почтовый индекс: ")
+
+    driver.find_element(By.ID, "first-name").send_keys(first_name)
+    driver.find_element(By.ID, "last-name").send_keys(last_name)
+    driver.find_element(By.ID, "postal-code").send_keys(postal_code)
+    driver.find_element(By.ID, "continue").click()
+
+    # Завершение оформления заказа
+    driver.find_element(By.ID, "finish").click()
+
+    # Получение информации о заказе
+    sleep(2) # Небольшая пауза для загрузки страницы подтверждения
+    confirmation_message = driver.find_element(By.CLASS_NAME, "complete-header").text
+    order_details = driver.find_element(By.CLASS_NAME, "summary_info").text
+
+    print("\n" + confirmation_message)
+    print(order_details)
+
+    # Закрытие браузера
+    driver.quit()
+
+if __name__ == "__main__":
+    main()
